@@ -1,0 +1,64 @@
+# This code is written in python
+# The pandas library is used for data processing and to read data files
+import pandas as pd 
+#The matplotlib library is used to plot histograms and scatter plots
+import matplotlib.pyplot as plt
+# The GWCutilities has functions to help format data printed to the console
+import GWCutilities as util
+
+#extension library
+import mpl_toolkits.mplot3d as mplot3d
+
+print("Madagascar and India. These two countries are 5,598 kilometers apart, close to the equator, and share similar geographic traits. In fact, scientists believed these two lands were connected at one point.")
+print("\n")
+print("In addition to being geographically connected, they also have social similarities (but not all are positive). They have similar age ranges of primary schooling and, especially in rural areas, have high concentrations of job opportunities in agriculture. Less positively, both countries have high rates of malaria, malnutrition, and poverty. Specifically in rural areas, the rate of primary education completion are relatively low. Both countries have also been deemed countries with low-quality living conditions.")
+print("\n")
+print("Despite these similarities, consider a young, eight-year-old girl in Madagascar who suffers from extreme malnutrition and spends her days working with textiles, cooking, and farming rice. What about the girl in India who spends her day learning in school? She, too, suffers from malnutrition, but she has been given the opportunity to educate herself. Furthermore, the Indian girl's family has more money, they're able to buy more quality housing and clothe themselves. The eight-year-old girl's family barely has enough to clothe all of their family members and often do not have the means to find clean water to wash themselves.")
+print("\n")
+input("Are you ready to continue (Press Enter)?")
+print("\n")
+print("What factors play a role in shaping the educational landscape, along with the employment in Madagascar and India that make these similar countries' rates different from each other?")
+print("\n")
+
+# Read a comma separated values (CSV) files into a variable
+# as a pandas DataFrame
+lwd=pd.read_csv("livwell135.csv")
+
+#cmap
+cmap = plt.get_cmap("viridis_r")
+plt.set_cmap(cmap)
+
+# Print out the number of rows and columns
+print(lwd.shape)
+
+primaryCompletedBooleanRanged = lwd["ED_attainment_primary_completed_p"].between (3.0, 7.0)
+primaryCompletedDataRanged = lwd.loc[primaryCompletedBooleanRanged]
+
+#finding india with the specific ranged primary completed data
+indiaCompletedPrimaryBoolean = primaryCompletedDataRanged["country_name"] == "India"
+indiaCompletedPrimaryData = primaryCompletedDataRanged.loc[indiaCompletedPrimaryBoolean]
+
+#finding madagascar with the specific ranged primary completed data
+madagascarCompletedPrimaryBoolean = primaryCompletedDataRanged["country_name"] == "Madagascar"
+madagascarCompletedPrimaryData = primaryCompletedDataRanged.loc[madagascarCompletedPrimaryBoolean]
+
+plt.scatter(indiaCompletedPrimaryData["ED_attainment_primary_completed_p"], indiaCompletedPrimaryData["WL_wealth_mean"], c = indiaCompletedPrimaryData["ED_attainment_primary_completed_p"],  cmap = cmap)
+
+plt.scatter(madagascarCompletedPrimaryData["ED_attainment_primary_completed_p"], madagascarCompletedPrimaryData["WL_wealth_mean"], c = madagascarCompletedPrimaryData["ED_attainment_primary_completed_p"], cmap = "magma")
+
+
+plt.title("Primary Education Completed vs. Average Wealth")
+plt.xlabel("Primary Education Completed (%)")
+plt.ylabel("Average Wealth")
+
+ax = plt.axes(projection = "3d")
+ax.scatter(indiaCompletedPrimaryData["ED_attainment_primary_completed_p"], indiaCompletedPrimaryData["WL_wealth_mean"], indiaCompletedPrimaryData["ED_educ_years_mean"], c = indiaCompletedPrimaryData["ED_attainment_primary_completed_p"],  cmap = cmap )
+
+ax.scatter(madagascarCompletedPrimaryData["ED_attainment_primary_completed_p"], madagascarCompletedPrimaryData["WL_wealth_mean"], madagascarCompletedPrimaryData["ED_educ_years_mean"], c =  madagascarCompletedPrimaryData["ED_attainment_primary_completed_p"], cmap = "magma")
+
+ax.set_xlabel("Primary Education Completed (%)")
+ax.set_ylabel("Wealth Mean")
+ax.set_zlabel("Education Years Mean")
+
+plt.legend(["India", "Madagascar"])
+plt.show()
